@@ -16,7 +16,7 @@ class PessoaController extends Controller {
       );
       return res.status(200).json(listMatriculas);
     } catch (error) {
-      req
+      res
         .status(500)
         .json({ message: `Erro interno do servidor! ${error.message}` });
     }

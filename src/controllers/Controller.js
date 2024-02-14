@@ -1,3 +1,4 @@
+const dataSource = require("../database/models");
 const converteIds = require("../utils/conversorDeStringHelper.js");
 
 class Controller {
@@ -43,10 +44,16 @@ class Controller {
 
   async add(req, res) {
     const dataToCreating = req.body;
+    const transaction = await dataSource.sequelize.transaction();
     try {
-      const dataCreated = await this.entityService.createRecord(dataToCreating);
+      const dataCreated = await this.entityService.createRecord(
+        dataToCreating,
+        transaction
+      );
+      await transaction.commit();
       return res.status(201).json(dataCreated);
     } catch (error) {
+      await transaction.rollback();
       return res
         .status(500)
         .json({ message: `Erro interno do servidor! ${error.message}` });

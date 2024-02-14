@@ -27,13 +27,14 @@ class Services {
     });
   }
 
-  async createRecord(recordData) {
-    return dataSource[this.model].create(recordData);
+  async createRecord(recordData, transaction) {
+    return dataSource[this.model].create(recordData, { transaction });
   }
 
-  async updateRecord(dataUpdated, where) {
+  async updateRecord(dataUpdated, where, transaction = {}) {
     const listOfRecordUpdated = dataSource[this.model].update(dataUpdated, {
       where: { ...where },
+      transaction,
     });
     if (listOfRecordUpdated[0] === 0) {
       return false;

@@ -47,6 +47,22 @@ class PessoaController extends Controller {
         .json({ message: `Erro interno do servidor! ${error.message}` });
     }
   }
+
+  async cancelRecordEstudante(req, res) {
+    const { estudante_id } = req.params;
+    try {
+      await pessoaServices.cancelPessoaAndMatriculas(Number(estudante_id));
+      return res
+        .status(200)
+        .json({
+          message: `Matriculas ref. estudante ${estudante_id} canceladas`,
+        });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: `Erro interno do servidor! ${error.message}` });
+    }
+  }
 }
 
 module.exports = PessoaController;

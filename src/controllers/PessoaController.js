@@ -8,13 +8,39 @@ class PessoaController extends Controller {
     super(pessoaServices);
   }
 
+  async getMatriculasAtivas(req, res) {
+    const { estudante_id } = req.params;
+    try {
+      const listMatriculas =
+        await pessoaServices.getMatriculasByEstudanteAtivas(
+          Number(estudante_id)
+        );
+      return res.status(200).json(listMatriculas);
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: `Erro interno do servidor! ${error.message}` });
+    }
+  }
+
   async getMatriculas(req, res) {
-    const { estudanteId } = req.params;
+    const { estudante_id } = req.params;
     try {
       const listMatriculas = await pessoaServices.getMatriculasByEstudante(
-        Number(estudanteId)
+        Number(estudante_id)
       );
       return res.status(200).json(listMatriculas);
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: `Erro interno do servidor! ${error.message}` });
+    }
+  }
+
+  async getAllPessoas(req, res) {
+    try {
+      const pessoas = await pessoaServices.getPessoasScopeAll();
+      return res.status(200).json(pessoas);
     } catch (error) {
       res
         .status(500)

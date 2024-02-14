@@ -1,4 +1,5 @@
 "use strict";
+const isCpfValid = require("../../utils/validCpfHelper.js");
 const { Model } = require("sequelize");
 
 module.exports = (sequelize, DataTypes) => {
@@ -9,17 +10,43 @@ module.exports = (sequelize, DataTypes) => {
       });
       Pessoa.hasMany(models.Matricula, {
         foreignKey: "estudante_id",
-        // scope: { status: "matriculado" },
-        // as: "aulasMatriculadas", alias para o getMatriculas
+        scope: { status: "matriculado" },
+        as: "aulasMatriculadas",
+      });
+      Pessoa.hasMany(models.Matricula, {
+        foreignKey: "estudante_id",
       });
     }
   }
 
   Pessoa.init(
     {
-      nome: DataTypes.STRING,
-      email: DataTypes.STRING,
-      cpf: DataTypes.STRING,
+      nome: {
+        type: DataTypes.STRING,
+        validate: {
+          len: {
+            args: [4, 30],
+            msg: "O nome deve ter no mínimo 3 e no máximo 30 caracteres.",
+          },
+        },
+      },
+      email: {
+        type: DataTypes.STRING,
+        validate: {
+          isEmail: {
+            args: true,
+            msg: "Formato do email inválido.",
+          },
+        },
+      },
+      cpf: {
+        type: DataTypes.STRING,
+        validate: {
+          cpfIsValid: (cpf) => {
+            if (!isCpfValid(cpf)) throw new Error("CPF inválido.");
+          },
+        },
+      },
       ativo: DataTypes.BOOLEAN,
       role: DataTypes.STRING,
     },
@@ -28,6 +55,14 @@ module.exports = (sequelize, DataTypes) => {
       modelName: "Pessoa",
       tableName: "pessoas",
       paranoid: true,
+      defaultScope: {
+        where: { ativo: true },
+      },
+      scopes: {
+        allRecords: {
+          where: {},
+        },
+      },
     }
   );
 

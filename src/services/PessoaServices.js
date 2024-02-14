@@ -5,11 +5,21 @@ class PessoaServices extends Services {
     super("Pessoa");
   }
 
+  async getMatriculasByEstudanteAtivas(id) {
+    const estudante = await super.getOneRecordById(id);
+    const listMatriculas = await estudante.getAulasMatriculadas(); // Utilizando o alias (as)
+    return listMatriculas;
+  }
+
   async getMatriculasByEstudante(id) {
     const estudante = await super.getOneRecordById(id);
     const listMatriculas = await estudante.getMatriculas();
-    // const listMatriculas = await estudante.aulasMatriculadas(); Utilizando o alias (as)
     return listMatriculas;
+  }
+
+  async getPessoasScopeAll() {
+    const pessoas = await super.getRecordsByScope("allRecords");
+    return pessoas;
   }
 }
 

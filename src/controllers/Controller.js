@@ -1,3 +1,5 @@
+const converteIds = require("../utils/conversorDeStringHelper.js");
+
 class Controller {
   constructor(entityService) {
     this.entityService = entityService;
@@ -26,6 +28,19 @@ class Controller {
     }
   }
 
+  async getOne(req, res) {
+    const { ...params } = req.params;
+    const where = converteIds(params);
+    try {
+      const oneEntity = await this.entityService.getOneRecord(where);
+      return res.status(200).json(oneEntity);
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: `Erro interno do servidor! ${error.message}` });
+    }
+  }
+
   async add(req, res) {
     const dataToCreating = req.body;
     try {
@@ -39,21 +54,20 @@ class Controller {
   }
 
   async update(req, res) {
-    const { id } = req.params;
+    const { ...params } = req.params;
+    const where = converteIds(params);
     const newDataToUpdate = req.body;
     try {
       const isUpdated = await this.entityService.updateRecord(
         newDataToUpdate,
-        id
+        where
       );
       if (!isUpdated) {
-        return res
-          .status(400)
-          .json({ message: `Registro do id: ${id} não foi atualizado` });
+        return res.status(400).json({ message: "Registro não foi atualizado" });
       }
       return res
         .status(200)
-        .json({ message: `O registro id: ${id} foi atualizado com sucesso!` });
+        .json({ message: "O registro foi atualizado com sucesso!" });
     } catch (error) {
       return res
         .status(500)
@@ -62,9 +76,10 @@ class Controller {
   }
 
   async remove(req, res) {
-    const { id } = req.params;
+    const { ...params } = req.params;
+    const where = converteIds(params);
     try {
-      await this.entityService.deleteRecord(id);
+      await this.entityService.deleteRecord(where);
       return res.status(200).json({ message: "Dado apagado com sucesso!" });
     } catch (error) {
       return res
